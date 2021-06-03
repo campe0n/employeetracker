@@ -38,6 +38,8 @@ const promptUser = () => {
             viewRoles();
           } else if (answer.list === "View employee's") {
             viewEmployees();
+          } else if (answer.list === "Update employee roles") {
+            updateRoles();
           } else {
             connection.end();
           }
@@ -169,6 +171,13 @@ const promptUser = () => {
                 promptUser();
               })
             }
+
+        const updateRoles = () => {
+            connection.query("SELECT * FROM role", (err, res) => {
+                if (err) throw err;
+                console.table(res);
+            })
+        }
 
 connection.connect((err) => {
   if (err) throw err;
