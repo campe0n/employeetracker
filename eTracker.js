@@ -46,7 +46,7 @@ const promptUser = () => {
         });
     };
 
-    const addDepartment = () => {
+const addDepartment = () => {
         inquirer
           .prompt([
             {
@@ -70,7 +70,7 @@ const promptUser = () => {
           });
       };
 
-      const addRole = () => {
+const addRole = () => {
         inquirer
           .prompt([
             {
@@ -99,8 +99,8 @@ const promptUser = () => {
             );
           });
       };
-
-      const addEmployee = () => {
+      
+const addEmployee = () => {
         inquirer
           .prompt([
             {
@@ -142,7 +142,7 @@ const promptUser = () => {
           });
       };
 
-      const viewDepartments = () => {
+const viewDepartments = () => {
         console.log('Showing all departments...\n');
           connection.query('SELECT * FROM department', (err, res) => {
             if (err) throw err;
@@ -152,7 +152,7 @@ const promptUser = () => {
           })
         }
       
-      const viewRoles = () => {
+const viewRoles = () => {
         console.log('Showing all roles...\n');
           connection.query('SELECT * FROM role', (err, res) => {
             if (err) throw err;
@@ -162,7 +162,7 @@ const promptUser = () => {
           })
         }
 
-        const viewEmployees = () => {
+const viewEmployees = () => {
             console.log("Showing all employee's...\n");
               connection.query('SELECT * FROM employee', (err, res) => {
                 if (err) throw err;
@@ -172,12 +172,56 @@ const promptUser = () => {
               })
             }
 
-        const updateRoles = () => {
-            connection.query("SELECT * FROM role", (err, res) => {
-                if (err) throw err;
-                console.table(res);
-            })
-        }
+const updateRoles = () => {
+            connection.query("select r.id,r.title,e.id,e.first_name,e.last_name, e.role_id from role as r Inner JOIN  employee as e on r.id = e.role_id order by r.id",(err, results) => {
+            inquirer.prompt([
+                {
+                    name: 'choice',
+                    type: 'rawlist',
+                    message: 'Which employee would you like to have their role updated?',
+                    choices() {
+                      var choiceArray = [];
+                      results.forEach(({first_name}) => {
+                        choiceArray.push(first_name);
+                      });
+                      return choiceArray;
+                    },
+                },
+                {
+                    name: 'newRole',
+                    type: 'rawlist',
+                    message: "What job would you like to change to?",
+                    choices() {
+                      var numberArray = [];
+                      results.forEach(({id}) => {
+                        numberArray.push(id);
+                      });   
+                      console.log(numberArray);
+                      return numberArray;
+                    }
+                },
+            ])
+            .then((answer) => {
+                connection.query(
+                    'UPDATE employee SET ? WHERE ?',
+                    [
+                      {
+                        role_id: answer.newRole,
+                      },
+                      {
+                        id: answer.choice,
+                      },
+                    ],
+                    (error) => {
+                      if (error) throw err;
+                      console.log('Employee role updated successfully!');
+                      promptUser();
+                    }
+                );
+            });
+        });
+    };
+            
 
 connection.connect((err) => {
   if (err) throw err;

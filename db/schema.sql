@@ -27,3 +27,7 @@ CREATE TABLE employee (
   manager_id INT,
   PRIMARY KEY (id)
 );
+
+select r.id,r.title,e.id,e.first_name,e.last_name, e.role_id
+from role as r Inner JOIN  employee as e
+where r.id = e.role_id
